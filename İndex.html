@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>❌⭕ Tic Tac Toe</title>
+<style>
+body { background: #0b1c2d; color: #eaeaea; font-family: "Segoe UI", sans-serif; text-align: center; margin: 0; padding: 0; }
+h1 { margin-top: 50px; }
+#gameScreen { display: none; }
+#game { display: grid; grid-template-columns: repeat(3, 100px); grid-gap: 5px; justify-content: center; margin-top: 20px; }
+.cell { width: 100px; height: 100px; background: #13293d; font-size: 64px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+#status { margin-top: 20px; font-size: 22px; }
+button { margin-top: 15px; padding: 10px 20px; font-size: 18px; cursor: pointer; border: none; background-color: #1b3a5a; color: white; }
+button:hover { background-color: #264d73; }
+</style>
+</head>
+<body>
+
+<div id="mainScreen">
+    <h1>❌⭕ Tic Tac Toe</h1>
+    <button id="playBtn">Oyna</button>
+</div>
+
+<div id="gameScreen">
+    <div id="status"></div>
+    <div id="game"></div>
+    <button id="restartBtn" style="display:none;">Yeniden Başlat</button>
+</div>
+
+<script>
+const mainScreen = document.getElementById("mainScreen");
+const gameScreen = document.getElementById("gameScreen");
+const playBtn = document.getElementById("playBtn");
+const game = document.getElementById("game");
+const status = document.getElementById("status");
+const restartBtn = document.getElementById("restartBtn");
+
+let board = [];
+let currentPlayer;
+let gameOver;
+
+playBtn.addEventListener("click", () => {
+    mainScreen.style.display = "none";
+    gameScreen.style.display = "block";
+    startGame();
+});
+
+function startGame() {
+    board = ["","","","","","","","",""];
+    currentPlayer = "X";
+    gameOver = false;
+    restartBtn.style.display = "none";
+    updateStatus();
+    createBoard();
+}
+
+function createBoard() {
+    game.innerHTML = "";
+    for (let i = 0; i < 9; i++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.dataset.index = i;
+        cell.addEventListener("click", handleClick);
+        game.appendChild(cell);
+    }
+}
+
+function handleClick(e) {
+    const index = e.target.dataset.index;
+    if (board[index] !== "" || gameOver) return;
+
+    board[index] = currentPlayer;
+    e.target.innerText = currentPlayer;
+    e.target.style.color = currentPlayer === "X" ? "#ff6b6b" : "#6bcfff";
+
+    const winner = checkWinner();
+    if (winner) {
+        status.innerHTML = winner === "X"
+            ? `<span style="color:#ff6b6b;">❌ X Kazandı!</span>`
+            : `<span style="color:#6bcfff;">⭕ O Kazandı!</span>`;
+        gameOver = true;
+        restartBtn.style.display = "inline-block";
+    } else if (board.every(cell => cell !== "")) {
+        status.innerHTML = "Berabere oldu! 🤝";
+        gameOver = true;
+        restartBtn.style.display = "inline-block";
+    } else {
+        currentPlayer = currentPlayer === "X" ? "O" : "X";
+        updateStatus();
+    }
+}
+
+function updateStatus() {
+    status.innerHTML = currentPlayer === "X"
+        ? `<span style="color:#ff6b6b;">❌ X'in Turu</span>`
+        : `<span style="color:#6bcfff;">⭕ O'nun Turu</span>`;
+}
+
+function checkWinner() {
+    const wins = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+    ];
+    for (let combo of wins) {
+        const [a,b,c] = combo;
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+            return board[a]; // Kazananı döndür
+        }
+    }
+    return null;
+}
+
+restartBtn.addEventListener("click", startGame);
+</script>
+
+</body>
+</html>
